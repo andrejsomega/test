@@ -1,0 +1,70 @@
+<form
+  class="flex justify-content-center align-items-center"
+  [formGroup]="formGroup"
+  #formDir="ngForm"
+  (ngSubmit)="onSubmit()"
+>
+  <div class="flex flex-column max-w-25rem">
+    <div class="flex flex-1 flex-row gap-5">
+      <div class="flex-1 p-fluid">
+        <label class="input-label" for="temperature">Temperature</label>
+        <p-inputNumber
+          inputId="temperature"
+          formControlName="temperature"
+          mode="decimal"
+          [maxFractionDigits]="1"
+        />
+        <div class="mt-1" *ngIf="temperature.invalid && temperature.touched">
+          <div *ngIf="temperature.errors?.['required']" class="text-xs">
+            Temperature is required.
+          </div>
+          <span
+            *ngIf="temperature.errors?.['minTemperatureC'] && !temperature.errors?.['required']"
+            class="text-xs"
+          >
+            Must be greater than 26.7 °C
+          </span>
+          <span
+            *ngIf="temperature.errors?.['minTemperatureF'] && !temperature.errors?.['required']"
+            class="text-sm"
+          >
+            Must be greater than 80 °F
+          </span>
+        </div>
+      </div>
+
+      <div class="flex flex-column b-1">
+        <label class="input-label" for="units-select">Unit</label>
+        <p-dropdown
+          formControlName="unit"
+          [options]="units"
+          optionLabel="symbol"
+          inputId="units-select"
+        />
+      </div>
+    </div>
+
+    <div class="p-fluid mt-2">
+      <label class="input-label" for="humidity">Humidity</label>
+      <p-inputNumber
+        inputId="humidity"
+        formControlName="humidity"
+        mode="decimal"
+        [maxFractionDigits]="1"
+        [min]="0"
+        [max]="100"
+      />
+      <div class="mt-1" *ngIf="humidity.invalid && humidity.touched">
+        <div *ngIf="humidity.errors?.['required']" class="text-xs">
+          Humidity is required.
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-column align-items-center mt-3">
+      <p-button type="submit" [disabled]="!formGroup.valid"
+        >Calculate</p-button
+      >
+    </div>
+  </div>
+</form>
