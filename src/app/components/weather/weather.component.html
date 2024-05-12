@@ -1,0 +1,68 @@
+<header class="grid">
+  <div class="col">
+    <div *ngIf="isHistoryMode">
+      <p-button (click)="buttonClicked()">TEST</p-button>
+    </div>
+  </div>
+  <div class="col flex justify-content-end">
+    <div class="flex align-items-center">
+      <label class="mr-3" for="historical-switch">Historical</label>
+      <div style="height: 28px">
+        <p-inputSwitch
+          class="flex-grow-0"
+          inputId="historical-switch"
+          [(ngModel)]="isHistoryMode"
+        />
+      </div>
+    </div>
+  </div>
+</header>
+
+<p-table [value]="weatherItems" [tableStyle]="{ 'min-width': '50rem' }">
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="time" style="width: 20%">
+        <div class="flex">
+          <span class="flex-1">Datetime</span>
+          <p-sortIcon class="" field="time" />
+        </div>
+      </th>
+
+      <th style="width: 20%">
+        <div class="flex">
+          <span class="flex-1">State</span>
+        </div>
+      </th>
+
+      <th pSortableColumn="temperature" style="width: 20%">
+        <div class="flex align-items-center">
+          <span class="flex-1">Temperature</span>
+          <p-sortIcon field="temperature" />
+        </div>
+      </th>
+
+      <th pSortableColumn="surfacePressure" style="width: 20%">
+        <div class="flex align-items-center">
+          <span class="flex-1">Surf. preassure</span>
+          <p-sortIcon field="surfacePressure" />
+        </div>
+      </th>
+
+      <th pSortableColumn="humidity" style="width: 20%">
+        <div class="flex align-items-center">
+          <span class="flex-1">Humidity</span>
+          <p-sortIcon field="humidity" />
+        </div>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-weather>
+    <tr>
+      <td>{{ formatTime(weather.time) }}</td>
+      <td class="text-center">{{ weather.weatherState.description }}</td>
+      <td class="text-right">{{ formatNumber(weather.temperature, 1, true) }}</td>
+      <td class="text-right">{{ formatNumber(weather.surfacePressure, 1, true) }}</td>
+      <td class="text-right">{{ formatNumber(weather.humidity, 1, true) }}</td>
+    </tr>
+  </ng-template>
+</p-table>

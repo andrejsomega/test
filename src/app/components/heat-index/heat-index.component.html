@@ -1,70 +1,93 @@
 <form
-  class="flex justify-content-center align-items-center"
+  class="formgrid grid"
   [formGroup]="formGroup"
   #formDir="ngForm"
   (ngSubmit)="onSubmit()"
 >
-  <div class="flex flex-column max-w-25rem">
-    <div class="flex flex-1 flex-row gap-5">
-      <div class="flex-1 p-fluid">
-        <label class="input-label" for="temperature">Temperature</label>
-        <p-inputNumber
-          inputId="temperature"
-          formControlName="temperature"
-          mode="decimal"
-          [maxFractionDigits]="1"
-        />
-        <div class="mt-1" *ngIf="temperature.invalid && temperature.touched">
-          <div *ngIf="temperature.errors?.['required']" class="text-xs">
-            Temperature is required.
-          </div>
-          <span
-            *ngIf="temperature.errors?.['minTemperatureC'] && !temperature.errors?.['required']"
-            class="text-xs"
-          >
-            Must be greater than 26.7 °C
-          </span>
-          <span
-            *ngIf="temperature.errors?.['minTemperatureF'] && !temperature.errors?.['required']"
-            class="text-sm"
-          >
-            Must be greater than 80 °F
-          </span>
-        </div>
-      </div>
+  <div class="field col-12 sm:col-8 p-fluid">
+    <label for="temperature">Temperature</label>
+    <p-inputNumber
+      inputId="temperature"
+      formControlName="temperature"
+      mode="decimal"
+      [maxFractionDigits]="1"
+      [useGrouping]="false"
+    />
+    <div class="mt-1" *ngIf="temperature.invalid && temperature.touched">
+      <small *ngIf="temperature.errors?.['required']">
+        Temperature is required.
+      </small>
 
-      <div class="flex flex-column b-1">
-        <label class="input-label" for="units-select">Unit</label>
-        <p-dropdown
-          formControlName="unit"
-          [options]="units"
-          optionLabel="symbol"
-          inputId="units-select"
-        />
-      </div>
-    </div>
-
-    <div class="p-fluid mt-2">
-      <label class="input-label" for="humidity">Humidity</label>
-      <p-inputNumber
-        inputId="humidity"
-        formControlName="humidity"
-        mode="decimal"
-        [maxFractionDigits]="1"
-        [min]="0"
-        [max]="100"
-      />
-      <div class="mt-1" *ngIf="humidity.invalid && humidity.touched">
-        <div *ngIf="humidity.errors?.['required']" class="text-xs">
-          Humidity is required.
-        </div>
-      </div>
-    </div>
-
-    <div class="flex flex-column align-items-center mt-3">
-      <p-button type="submit" [disabled]="!formGroup.valid"
-        >Calculate</p-button
+      <small
+        *ngIf="temperature.errors?.['minTemperatureC'] && !temperature.errors?.['required']"
       >
+        Must be greater than 26.7 °C
+      </small>
+      <small
+        *ngIf="temperature.errors?.['minTemperatureF'] && !temperature.errors?.['required']"
+        class="text-sm"
+      >
+        Must be greater than 80 °F
+      </small>
     </div>
   </div>
+  <div class="field col-12 sm:col-4 p-fluid">
+    <label for="units-select">Unit</label>
+    <p-dropdown
+      formControlName="unit"
+      [options]="units"
+      optionLabel="symbol"
+      inputId="units-select"
+    />
+  </div>
+
+  <div class="field col-12 p-fluid">
+    <label for="humidity">Humidity</label>
+    <p-inputNumber
+      inputId="humidity"
+      formControlName="humidity"
+      mode="decimal"
+      [useGrouping]="false"
+      [maxFractionDigits]="1"
+      [min]="0"
+      [max]="100"
+    />
+    <div class="mt-1" *ngIf="humidity.invalid && humidity.touched">
+      <div *ngIf="humidity.errors?.['required']" class="text-xs">
+        Humidity is required.
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12" *ngIf="heatIndex != undefined">
+    <label class="block" for="humidity">Result</label>
+    <p class="text-xl text-center">{{ heatIndex }}</p>
+  </div>
+
+  <div class="col-12 flex flex-column align-items-center my-1">
+    <p-button type="submit" [disabled]="!formGroup.valid">Calculate</p-button>
+  </div>
 </form>
+
+<div
+  *ngIf="heatIndexHistory.length !== 0"
+  class="delimiter flex-1 w-full mt-3"
+></div>
+
+<section *ngIf="heatIndexHistory.length !== 0" class="flex flex-column">
+  <h3 class="mt-3 mb-1">History</h3>
+  <p-table [value]="heatIndexHistory">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Date</th>
+        <th>Heat Index</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-heatIndexItem>
+      <tr>
+        <td>{{ formatTime(heatIndexItem.date) }}</td>
+        <td>{{ heatIndexItem.heatIndex }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>

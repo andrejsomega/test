@@ -3,23 +3,20 @@ import {
   AbstractControl,
   FormControl,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { Button, ButtonModule } from 'primeng/button';
-import { InputText, InputTextModule } from 'primeng/inputtext';
-import { CommonModule, NgIf } from '@angular/common';
-
-interface Unit {
-  name: string;
-  symbol: string;
-}
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TableModule } from 'primeng/table';
+import { NgIf } from '@angular/common';
+import { LocalStorageService } from '../../services/local-storage.service';
+import { HeatIndexHistoryItem, Unit } from '../../types/heat-index.type';
+import { formatDateTimeMinutes } from '../../utils/utils';
 
 @Component({
   selector: 'app-heat-index',
@@ -31,8 +28,10 @@ interface Unit {
     FloatLabelModule,
     ButtonModule,
     InputTextModule,
+    TableModule,
     NgIf,
   ],
+  providers: [LocalStorageService],
   templateUrl: './heat-index.component.html',
   styleUrl: './heat-index.component.scss',
 })
@@ -41,10 +40,16 @@ export class HeatIndexComponent implements OnInit {
 
   formGroup!: FormGroup;
 
+  heatIndex: string | undefined;
+
+  heatIndexHistory!: HeatIndexHistoryItem[];
+
+  constructor(private localStorageService: LocalStorageService) {}
+
   ngOnInit() {
     this.units = [
       { name: 'Celsius', symbol: '°C' },
-      { name: 'Farenheit', symbol: '°F' },
+      { name: 'Fahrenheit', symbol: '°F' },
     ];
 
     this.formGroup = new FormGroup({
@@ -56,14 +61,36 @@ export class HeatIndexComponent implements OnInit {
       humidity: new FormControl(null, [Validators.required]),
     });
 
+    this.heatIndexHistory = this.localStorageService.getHeatIndexHistory();
+
     this.formGroup.get('unit')?.valueChanges.subscribe((value) => {
-      console.log('New unit value:', value);
       this.temperature.updateValueAndValidity();
     });
   }
 
   onSubmit() {
-    console.warn(this.formGroup.value);
+    console.log('calculate', this.formGroup.value);
+    const rh = this.humidity.value;
+    const t = this.getSelectedTempInFahrenheit();
+
+    this.heatIndex = (
+      -42.379 +
+      2.04901523 * t +
+      10.14333127 * rh -
+      0.22475541 * t * rh -
+      (6.83783 ^ (3 * 10) ^ (-3 * t) ^ -2) -
+      ((5.481717 * 10) ^ (-2 * rh) ^ 2) +
+      ((1.22874 * 10) ^ (-3 * t) ^ (2 * rh)) +
+      ((8.5282 * 10) ^ (4 * t * rh) ^ 2) -
+      ((1.99 * 10) ^ (-6 * t) ^ (2 * rh) ^ 2)
+    ).toFixed(0);
+
+    const newHeatIndex = {
+      date: new Date(),
+      heatIndex: parseInt(this.heatIndex),
+    };
+    this.heatIndexHistory.unshift(newHeatIndex);
+    this.localStorageService.saveHeatIndex(newHeatIndex);
   }
 
   get temperature() {
@@ -78,6 +105,12 @@ export class HeatIndexComponent implements OnInit {
     return this.formGroup?.get('humidity')!;
   }
 
+  getSelectedTempInFahrenheit() {
+    return this.unit.value.name == 'Celsius'
+      ? 1.8 * this.temperature.value + 32
+      : this.temperature.value;
+  }
+
   minTemperatureValidator(control: AbstractControl): ValidationErrors | null {
     const temperature = this.temperature?.value;
     const unit = this.unit?.value;
@@ -85,9 +118,13 @@ export class HeatIndexComponent implements OnInit {
     if (unit?.name == 'Celsius' && temperature < 26.7) {
       console.log('zle', temperature);
       return { minTemperatureC: true };
-    } else if (unit?.name == 'Farenheit' && temperature < 80) {
+    } else if (unit?.name == 'Fahrenheit' && temperature < 80) {
       return { minTemperatureF: true };
     }
     return null;
+  }
+
+  formatTime(date: Date) {
+    return formatDateTimeMinutes(date);
   }
 }

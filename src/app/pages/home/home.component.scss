@@ -1,8 +1,14 @@
 .container {
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
 }
 
 :host ::ng-deep .p-card-content {
   padding: 0;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-panels {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
 }
