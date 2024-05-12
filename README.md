@@ -13,7 +13,7 @@ To run this application locally, follow these steps:
 1. Clone the repository to your local machine.
 
    ```bash
-   git clone https://github.com/your-username/simple-weather-app.git
+   git clone https://github.com/your-username/simple-weather-app.git](https://github.com/andrejsomega/weather-app.git
     ```
 
 2. Navigate to the project directory.
