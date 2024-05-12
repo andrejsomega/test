@@ -27,3 +27,8 @@ export const WEATHER_CODES_MAP = new Map([
   ['96', 'Thunderstorm with slight hail'],
   ['99', 'Thunderstorm with slight hail'],
 ]);
+
+export const TEMPERATURE_UNITS = [
+  { name: 'Celsius', symbol: '°C' },
+  { name: 'Fahrenheit', symbol: '°F' },
+];

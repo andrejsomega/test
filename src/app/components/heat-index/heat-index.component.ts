@@ -17,6 +17,7 @@ import { NgIf } from '@angular/common';
 import { LocalStorageService } from '../../services/local-storage.service';
 import { HeatIndexHistoryItem, Unit } from '../../types/heat-index.type';
 import { formatDateTimeMinutes } from '../../utils/utils';
+import { TEMPERATURE_UNITS } from '../../utils/constants';
 
 @Component({
   selector: 'app-heat-index',
@@ -47,10 +48,7 @@ export class HeatIndexComponent implements OnInit {
   constructor(private localStorageService: LocalStorageService) {}
 
   ngOnInit() {
-    this.units = [
-      { name: 'Celsius', symbol: '°C' },
-      { name: 'Fahrenheit', symbol: '°F' },
-    ];
+    this.units = TEMPERATURE_UNITS;
 
     this.formGroup = new FormGroup({
       temperature: new FormControl(null, [
@@ -69,7 +67,6 @@ export class HeatIndexComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('calculate', this.formGroup.value);
     const rh = this.humidity.value;
     const t = this.getSelectedTempInFahrenheit();
 
@@ -116,7 +113,6 @@ export class HeatIndexComponent implements OnInit {
     const unit = this.unit?.value;
 
     if (unit?.name == 'Celsius' && temperature < 26.7) {
-      console.log('zle', temperature);
       return { minTemperatureC: true };
     } else if (unit?.name == 'Fahrenheit' && temperature < 80) {
       return { minTemperatureF: true };

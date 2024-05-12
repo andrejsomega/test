@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { WeatherService } from '../../services/weather.service';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -31,10 +31,12 @@ import { NgIf } from '@angular/common';
   styleUrl: './weather.component.scss',
 })
 export class WeatherComponent implements OnInit {
+  @Output() weatherItemsValueChange: EventEmitter<WeatherItem[]> =
+    new EventEmitter<WeatherItem[]>();
+
   isHistoryMode: boolean = false;
-  rangeDates: Date[] | undefined;
+  rangeDates: Date[] = [];
   weatherItems: WeatherItem[] = [];
-  formattedWeatherItems: any[] = [];
   today = new Date();
 
   constructor(private weatherService: WeatherService) {}
@@ -52,7 +54,6 @@ export class WeatherComponent implements OnInit {
   }
 
   onDateRangeSelect(event: any) {
-    console.log('Range selected', this.rangeDates);
     if (
       this.isHistoryMode &&
       this.rangeDates !== undefined &&
@@ -68,7 +69,6 @@ export class WeatherComponent implements OnInit {
   }
 
   onToggleHistory(event: any) {
-    console.log('History changed', this.isHistoryMode);
     if (!this.isHistoryMode) {
       this.fetchAndProcessForecast();
     }
@@ -79,17 +79,9 @@ export class WeatherComponent implements OnInit {
       .fetchHourlyForecast()
       .then((items) => {
         this.weatherItems = items;
-        this.formattedWeatherItems = items.map((item) => {
-          return {
-            time: this.formatTime(item.time),
-            weatherStatus: item.weatherState,
-            temperature: this.formatNumber(item.temperature, 1, true),
-            surfacePressure: this.formatNumber(item.temperature, 1, true),
-            humidity: this.formatNumber(item.humidity, 1, true),
-          };
-        });
 
-        console.log(this.formattedWeatherItems);
+        console.log('New forecast items', items);
+        this.weatherItemsValueChange.emit(this.weatherItems);
       })
       .catch((error) =>
         console.error('Error occured while fetching weathed data', error)
@@ -101,17 +93,9 @@ export class WeatherComponent implements OnInit {
       .fetchHourlyHistoricalData(dateFrom, dateTo)
       .then((items) => {
         this.weatherItems = items;
-        this.formattedWeatherItems = items.map((item) => {
-          return {
-            time: this.formatTime(item.time),
-            weatherStatus: item.weatherState,
-            temperature: this.formatNumber(item.temperature, 1, true),
-            surfacePressure: this.formatNumber(item.temperature, 1, true),
-            humidity: this.formatNumber(item.humidity, 1, true),
-          };
-        });
 
-        console.log(this.formattedWeatherItems);
+        console.log('New history items', items);
+        this.weatherItemsValueChange.emit(this.weatherItems);
       })
       .catch((error) =>
         console.error('Error occured while fetching historical data', error)

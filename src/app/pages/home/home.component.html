@@ -3,10 +3,12 @@
     <p-card>
       <p-tabView>
         <p-tabPanel header="Weather">
-          <app-weather></app-weather>
+          <app-weather
+            (weatherItemsValueChange)="onWeatherItemsValueChange($event)"
+          ></app-weather>
         </p-tabPanel>
         <p-tabPanel header="Weather chart">
-          <app-weather-chart></app-weather-chart>
+          <app-weather-chart [weatherItems]="weatherItems"></app-weather-chart>
         </p-tabPanel>
         <p-tabPanel header="Heat index calculator">
           <app-heat-index></app-heat-index>

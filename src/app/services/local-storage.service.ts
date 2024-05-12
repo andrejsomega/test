@@ -9,14 +9,9 @@ export class LocalStorageService {
 
   public saveHeatIndex(heatIndex: HeatIndexHistoryItem) {
     const history = this.getHeatIndexHistory();
-
-    console.log('History was', history);
-
     history.push(heatIndex);
 
     const newHistory = history.slice(-5);
-
-    console.log('New history was', newHistory);
 
     localStorage.setItem('history', JSON.stringify(newHistory));
   }

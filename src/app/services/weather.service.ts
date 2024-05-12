@@ -4,14 +4,15 @@ import { WeatherItem } from '../types/weather.type';
 import { parseWeatherCode } from '../utils/utils';
 
 const PARAMS_DEFAULT = {
-  latitude: 52.52,
-  longitude: 13.41,
+	latitude: 51.50735,
+	longitude: -0.12776,
   hourly: [
     'temperature_2m',
     'relative_humidity_2m',
     'weather_code',
     'surface_pressure',
   ],
+  timezone: 'Europe/Berlin',
 };
 
 @Injectable({
@@ -49,8 +50,6 @@ export class WeatherService {
       ],
     };
 
-    console.log(paramaters);
-
     const responses = await fetchWeatherApi(this.ARCHIVE_URL, paramaters);
 
     return this.parseWeatherResponse(responses);
@@ -73,7 +72,7 @@ export class WeatherService {
         Number(hourly.time()),
         Number(hourly.timeEnd()),
         hourly.interval()
-      ).map((t) => new Date((t + utcOffsetSeconds) * 1000)),
+      ).map((t) => new Date(t * 1000)),
       temperature2m: hourly.variables(0)!.valuesArray()!,
       relativeHumidity2m: hourly.variables(1)!.valuesArray()!,
       weatherCode: hourly.variables(2)!.valuesArray()!,

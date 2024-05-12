@@ -3,11 +3,16 @@
 }
 
 :host ::ng-deep .p-datatable .p-datatable-header {
-    background-color: inherit;
-    border: 0;
+  background-color: inherit;
+  border: 0;
 }
 
 :host ::ng-deep .p-datatable .p-datatable-header {
-    padding-left: 0;
-    padding-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-panels {
+  padding-top: 0;
 }
