@@ -1,9 +1,4 @@
 <header class="grid">
-  <div class="col">
-    <div *ngIf="isHistoryMode">
-      <p-button (click)="buttonClicked()">TEST</p-button>
-    </div>
-  </div>
   <div class="col flex justify-content-end">
     <div class="flex align-items-center">
       <label class="mr-3" for="historical-switch">Historical</label>
@@ -12,13 +7,58 @@
           class="flex-grow-0"
           inputId="historical-switch"
           [(ngModel)]="isHistoryMode"
+          (onChange)="onToggleHistory($event)"
         />
       </div>
     </div>
   </div>
 </header>
 
-<p-table [value]="weatherItems" [tableStyle]="{ 'min-width': '50rem' }">
+<p-table
+  #dt2
+  [value]="formattedWeatherItems"
+  sortField="time"
+  [sortOrder]="1"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[5, 10, 15]"
+  [globalFilterFields]="[
+    'time',
+    'weatherState.description',
+    'temperature',
+    'surfacePressure',
+    'humidity'
+  ]"
+  [tableStyle]="{ 'min-width': '50rem' }"
+>
+  <ng-template pTemplate="caption">
+    <div class="flex align-items-center">
+      <div *ngIf="isHistoryMode">
+        <p-calendar
+          [(ngModel)]="rangeDates"
+          selectionMode="range"
+          [iconDisplay]="'input'"
+          [showIcon]="true"
+          [readonlyInput]="true"
+          [maxDate]="today"
+          (onSelect)="onDateRangeSelect($event)"
+        />
+      </div>
+      <p-iconField iconPosition="left" class="ml-auto">
+        <p-inputIcon>
+          <i class="pi pi-search"></i>
+        </p-inputIcon>
+        <input
+          pInputText
+          type="text"
+          #inputSearch
+          (input)="dt2.filterGlobal(inputSearch.value, 'contains')"
+          placeholder="Search keyword"
+        />
+      </p-iconField>
+    </div>
+  </ng-template>
+
   <ng-template pTemplate="header">
     <tr>
       <th pSortableColumn="time" style="width: 20%">
@@ -58,11 +98,15 @@
   </ng-template>
   <ng-template pTemplate="body" let-weather>
     <tr>
-      <td>{{ formatTime(weather.time) }}</td>
-      <td class="text-center">{{ weather.weatherState.description }}</td>
-      <td class="text-right">{{ formatNumber(weather.temperature, 1, true) }}</td>
-      <td class="text-right">{{ formatNumber(weather.surfacePressure, 1, true) }}</td>
-      <td class="text-right">{{ formatNumber(weather.humidity, 1, true) }}</td>
+      <td>{{ weather.time }}</td>
+      <td class="text-center">{{ weather.weatherStatus.description }}</td>
+      <td class="text-right">
+        {{ weather.temperature }}
+      </td>
+      <td class="text-right">
+        {{ weather.surfacePressure }}
+      </td>
+      <td class="text-right">{{ weather.humidity }}</td>
     </tr>
   </ng-template>
 </p-table>

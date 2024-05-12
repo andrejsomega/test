@@ -4,6 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { HeatIndexComponent } from '../../components/heat-index/heat-index.component';
 import { WeatherComponent } from '../../components/weather/weather.component';
+import { WeatherChartComponent } from '../../components/weather-chart/weather-chart.component';
 
 @Component({
   selector: 'app-home',
@@ -13,6 +14,7 @@ import { WeatherComponent } from '../../components/weather/weather.component';
     ButtonModule,
     CardModule,
     WeatherComponent,
+    WeatherChartComponent,
     HeatIndexComponent,
   ],
   templateUrl: './home.component.html',

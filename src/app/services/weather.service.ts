@@ -3,7 +3,7 @@ import { fetchWeatherApi } from 'openmeteo';
 import { WeatherItem } from '../types/weather.type';
 import { parseWeatherCode } from '../utils/utils';
 
-const params = {
+const PARAMS_DEFAULT = {
   latitude: 52.52,
   longitude: 13.41,
   hourly: [
@@ -14,25 +14,49 @@ const params = {
   ],
 };
 
-// Helper function to form time ranges
-const range = (start: number, stop: number, step: number) =>
-  Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
-
 @Injectable({
   providedIn: 'root',
 })
 export class WeatherService {
-  URL = 'https://api.open-meteo.com/v1/forecast';
+  FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
+  ARCHIVE_URL = 'https://archive-api.open-meteo.com/v1/archive';
 
   constructor() {}
 
   public async fetchHourlyForecast() {
-    const responses = await fetchWeatherApi(this.URL, params);
+    const responses = await fetchWeatherApi(this.FORECAST_URL, PARAMS_DEFAULT);
 
     return this.parseWeatherResponse(responses);
   }
 
-  private parseWeatherResponse(responses: any): WeatherItem[] {
+  public async fetchHourlyHistoricalData(dateFrom: Date, dateTo: Date) {
+    const paramaters = {
+      ...PARAMS_DEFAULT,
+      start_date: this.formatDateParameter(dateFrom),
+      end_date: this.formatDateParameter(dateTo),
+    };
+
+    const params2 = {
+      latitude: 52.52,
+      longitude: 13.41,
+      start_date: '2024-04-26',
+      end_date: '2024-05-10',
+      hourly: [
+        'temperature_2m',
+        'relative_humidity_2m',
+        'weather_code',
+        'surface_pressure',
+      ],
+    };
+
+    console.log(paramaters);
+
+    const responses = await fetchWeatherApi(this.ARCHIVE_URL, paramaters);
+
+    return this.parseWeatherResponse(responses);
+  }
+
+  parseWeatherResponse(responses: any): WeatherItem[] {
     // Helper function to form time ranges
     const range = (start: number, stop: number, step: number) =>
       Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
@@ -58,14 +82,6 @@ export class WeatherService {
 
     const weatherItems: WeatherItem[] = [];
     for (let i = 0; i < weatherDataHourly.time.length; i++) {
-      console.log(
-        weatherDataHourly.time[i].toISOString(),
-        weatherDataHourly.temperature2m[i],
-        weatherDataHourly.relativeHumidity2m[i],
-        weatherDataHourly.weatherCode[i],
-        weatherDataHourly.surfacePressure[i]
-      );
-
       const item: WeatherItem = {
         time: weatherDataHourly.time[i],
         temperature: weatherDataHourly.temperature2m[i],
@@ -77,9 +93,14 @@ export class WeatherService {
       weatherItems.push(item);
     }
 
-    const filtered = weatherItems.filter((item) => item.weatherState?.description == "");
-    console.log('filtered', filtered);
-
     return weatherItems;
+  }
+
+  formatDateParameter(date: Date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${year}-${month}-${day}`;
   }
 }
